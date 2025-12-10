@@ -1,0 +1,98 @@
+/* Container Utama Aplikasi */
+.app-container {
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Header Section */
+.app-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.app-title {
+  color: #333;
+}
+
+.app-subtitle {
+  color: #666;
+}
+
+/* Navigasi Button Container */
+.nav-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+/* Tombol Navigasi (State Default/Tidak Aktif) */
+.nav-button {
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+/* Tombol Navigasi saat Hover */
+.nav-button:hover {
+  transform: translateY(-2px); /* Efek naik dikit pas di hover */
+}
+
+/* State AKTIF (Saat tombol dipilih) */
+/* Kita akan men-toggle class ini lewat SolidJS */
+.nav-button.active {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+/* Judul Status Ruangan */
+.status-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Grid Dashboard Container */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Style untuk Komponen Chart Placeholder --- */
+.chart-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #ccc;
+}
+
+.chart-title {
+  margin: 0;
+  color: #555;
+}
+
+.chart-subtitle {
+  color: #888;
+  font-size: 14px;
+}
+
+.chart-value {
+  color: #2563eb;
+  margin: 10px 0;
+}

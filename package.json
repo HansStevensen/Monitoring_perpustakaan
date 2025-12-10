@@ -1,0 +1,25 @@
+{
+  "name": "library-monitor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@solidjs/router": "^0.15.4",
+    "chart.js": "^4.5.1",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "mqtt": "^5.14.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "solid-js": "^1.9.10"
+  },
+  "devDependencies": {
+    "vite": "^7.2.4",
+    "vite-plugin-solid": "^2.11.10"
+  }
+}
