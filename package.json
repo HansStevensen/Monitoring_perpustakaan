@@ -21,5 +21,18 @@
   "devDependencies": {
     "vite": "^7.2.4",
     "vite-plugin-solid": "^2.11.10"
-  }
+  },
+  "description": "```bash\r $ npm install # or pnpm install or yarn install\r ```",
+  "main": "vite.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HansStevensen/Monitoring_perpustakaan.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HansStevensen/Monitoring_perpustakaan/issues"
+  },
+  "homepage": "https://github.com/HansStevensen/Monitoring_perpustakaan#readme"
 }
