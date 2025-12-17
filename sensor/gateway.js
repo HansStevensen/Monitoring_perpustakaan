@@ -1,5 +1,5 @@
-const { SerialPort } = require('serialport');
-const mqtt = require('mqtt');
+import {SerialPort} from "serialport";
+import mqtt from "mqtt";
 
 // --- KONFIGURASI ---
 const SERIAL_PORT = 'COM6'; // Ganti dengan PORT Arduino Base Station Anda
@@ -32,7 +32,6 @@ mqttClient.on('connect', () => {
 
 // 3. Logika Utama: Membaca Data Serial
 let buffer = Buffer.alloc(0); // Buffer penampung data pecahan
-
 port.on('data', (chunk) => {
     // Gabungkan data baru ke buffer
     buffer = Buffer.concat([buffer, chunk]);
