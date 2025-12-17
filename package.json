@@ -14,6 +14,7 @@
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "mqtt": "^5.14.1",
+    "serialport": "^13.0.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "solid-js": "^1.9.10"
@@ -21,5 +22,18 @@
   "devDependencies": {
     "vite": "^7.2.4",
     "vite-plugin-solid": "^2.11.10"
-  }
+  },
+  "description": "```bash\r $ npm install # or pnpm install or yarn install\r ```",
+  "main": "vite.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HansStevensen/Monitoring_perpustakaan.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HansStevensen/Monitoring_perpustakaan/issues"
+  },
+  "homepage": "https://github.com/HansStevensen/Monitoring_perpustakaan#readme"
 }

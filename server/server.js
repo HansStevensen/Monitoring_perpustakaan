@@ -25,7 +25,7 @@ mqttClient.on('connect', () => {
     console.log("Backend: Terhubung ke MQTT Broker!");
     // Kita subscribe ke topik yang lebih luas biar bisa nangkep semua ruangan
     // Contoh format topik: sensor/R01/suhu atau sensor/R02/kebisingan
-    mqttClient.subscribe('sensor/+/+'); 
+    mqttClient.subscribe('sensor/R01/suhu'); 
 });
 
 // --- 2. Saat Data Masuk dari Sensor ---
@@ -43,7 +43,6 @@ mqttClient.on('message', (topic, message) => {
         const tipe = parts[2];   // suhu, kelembapan, dll
         
         // Kirim ke Frontend via WebSocket
-        // Kita kirim objek JSON biar rapi
         io.emit('updateSensor', {
             roomId: roomId,
             tipe: tipe,
