@@ -1,40 +1,36 @@
-/* src/RoomMonitor.jsx */
 import { useParams } from "@solidjs/router";
-import { Show } from "solid-js";
-import { DATA_PERPUSTAKAAN } from "./data"; // Import data langsung
-import { globalData } from "./store"; // Import Global Data yang Live
+import { Show} from "solid-js";
+import { globalData } from "./store"; 
+import "./RoomMonitor.css";
+import ChartCard from "./components/ChartCard";//import komponen ChartCard untuk menampilkan masing-masing item (suhu dll)
 
-function ChartPlaceholder(props) {
-  //holder chart nya
-  return (
-    <div class="chart-card">
-      <h3 class="chart-title">{props.title}</h3>
-      <p class="chart-subtitle">Area Chart ({props.data.length} items)</p>
-      <h2 class="chart-value">
-        {props.data[props.data.length - 1]}
-        {props.title === "Suhu" ? "°C" : props.title === "Kebisingan" ? " dB" : ""}
-      </h2>
-    </div>
-  );
-}
 
 export default function RoomMonitor() {
+  //useParams dipake untuk ngambil parameter dinamis dari url
   const params = useParams();
   
+  // Mengambil data ruangan berdasarkan ID di URL (R01, R02, dst)
+  //mengambil data dari ID yang ada
   const roomData = () => {
-    // Ambil ID dari URL, ubah ke Huruf Besar biar cocok dengan key Data
     const id = params.id ? params.id.toUpperCase() : "";
     return globalData[id];
   };
 
+  //show dipake untuk nampilin data, dan ada fallback semisalnya gaada ruangannya
   return (
-    <Show when={roomData()} fallback={<div style="text-align:center; color:red; margin-top:20px;">Ruangan tidak ditemukan!</div>}>
-      <h2 class="status-title">Status: {roomData().nama}</h2>
-      <div class="dashboard-grid">
-        <ChartPlaceholder title="Suhu" data={roomData().suhu} />
-        <ChartPlaceholder title="Kelembapan" data={roomData().kelembapan} />
-        <ChartPlaceholder title="Cahaya" data={roomData().cahaya} />
-        <ChartPlaceholder title="Kebisingan" data={roomData().kebisingan} />
+    <Show 
+      when={roomData()} 
+      fallback={<div class="not-found-msg">Ruangan tidak ditemukan atau data belum dimuat.</div>}
+    >
+      <div class="monitor-container">
+        <h2 class="status-title">Monitoring: {roomData().nama}</h2>
+
+        <div class="dashboard-grid">
+          <ChartCard title="Suhu" data={roomData().suhu} />
+          <ChartCard title="Kelembapan" data={roomData().kelembapan} />
+          <ChartCard title="Cahaya" data={roomData().cahaya} />
+          <ChartCard title="Kebisingan" data={roomData().kebisingan} />
+        </div>
       </div>
     </Show>
   );

@@ -1,0 +1,135 @@
+.monitor-container {
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.status-title {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+}
+
+/* --- Container Sensor Block --- */
+.sensor-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- Card Styles --- */
+.chart-card {
+  background: white;
+  border: 1px dashed #cbd5e1;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card.is-error {
+  border: 2px solid #ef4444;
+  background: #fff5f5;
+  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.1);
+}
+
+.chart-title {
+  font-size: 1rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+}
+
+/* --- Typography --- */
+.chart-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 0;
+}
+
+.text-mode-value {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+.is-error .chart-value, 
+.is-error .text-mode-value {
+  color: #dc2626;
+}
+
+.unit-text { font-size: 1.5rem; margin-left: 8px; }
+.unit-text-small { font-size: 1rem; margin-left: 4px; }
+
+.chart-status-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 8px;
+}
+
+/* --- Button Group (Two Options) --- */
+.button-group {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.view-btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  color: #1e293b;
+}
+
+.view-btn.active {
+  background: white;
+  color: #2563eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Alert Badge --- */
+.error-badge {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 15px;
+  display: inline-block;
+  align-self: center;
+}
+
+.not-found-msg {
+  text-align: center;
+  margin-top: 100px;
+  font-size: 1.2rem;
+  color: #94a3b8;
+}
