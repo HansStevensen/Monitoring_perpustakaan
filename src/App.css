@@ -39,6 +39,7 @@
   color: #333;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
+  text-decoration: none;
 }
 
 /* Tombol Navigasi saat Hover */
