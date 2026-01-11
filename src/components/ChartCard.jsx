@@ -42,10 +42,20 @@ export default function ChartCard(props) {
   const hasError = () => {
     const val = lastValue();
     switch (props.title) {
-      case "Suhu": return val > LIMITS.suhuMax;
-      case "Kebisingan": return val > LIMITS.kebisinganMax;
-      case "Kelembapan": return val > LIMITS.kelembapanMax;
-      case "Cahaya": return val < LIMITS.cahayaMin; 
+      // Suhu: Error jika Terlalu Panas ATAU Terlalu Dingin
+      case "Suhu": 
+        return val < LIMITS.suhuMin || val > LIMITS.suhuMax;
+      
+      // Kelembapan: Error jika Terlalu Kering ATAU Terlalu Lembab
+      case "Kelembapan": 
+        return val < LIMITS.kelembapanMin || val > LIMITS.kelembapanMax;
+        
+      case "Kebisingan": 
+        return val > LIMITS.kebisinganMax;
+        
+      case "Cahaya": 
+        return val < LIMITS.cahayaMin; 
+        
       default: return false;
     }
   };
@@ -159,7 +169,7 @@ export default function ChartCard(props) {
         {/* --- BADGE ERROR --- */}
         <Show when={hasError()}>
           <div class="error-badge">
-            {props.title === "Cahaya" ? "Cahaya Redup!" : "Batas Terlampaui!"}
+            {props.title === "Cahaya" ? "Kurang Terang!" : "Tidak Ideal!"}
           </div>
         </Show>
 
