@@ -31,11 +31,33 @@ const SENSE_MAP = {
 };
 
 // --- 1. KONEKSI MQTT ---
-const mqttClient = mqtt.connect('mqtt://localhost:1883');
+const MQTT_HOST = 'cfc4476f1be24988afb769aef8526aee.s1.eu.hivemq.cloud'; // Cek "Cluster URL" di dashboard
+const MQTT_USER = 'matchalatte';    // Username yang anda buat di Access Management
+const MQTT_PASS = 'Manuk123_';    // Password yang anda buat
+const MQTT_PORT = 8883;
+
+const mqttOptions = {
+    username: MQTT_USER,
+    password: MQTT_PASS,
+    port: MQTT_PORT,
+    protocol: 'mqtts', // Penting: Menggunakan 'mqtts' untuk koneksi aman (SSL)
+    rejectUnauthorized: true, // Pastikan sertifikat server valid
+};
+
+// Hubungkan client
+const mqttClient = mqtt.connect(`mqtts://${MQTT_HOST}`, mqttOptions);
 
 mqttClient.on('connect', () => {
-    console.log("✅ Backend: Terhubung ke MQTT Broker");
+    console.log(`[SERVER] BERHASIL Terhubung ke HiveMQ Cloud!`);
     mqttClient.subscribe('sensor/+/+'); 
+});
+
+mqttClient.on('error', (err) => {
+    console.error(`[SERVER] Error Koneksi MQTT:`, err.message);
+});
+
+mqttClient.on('offline', () => {
+    console.log(`[SERVER] Koneksi MQTT terputus, mencoba menyambung ulang...`);
 });
 
 mqttClient.on('message', async (topic, message) => {
