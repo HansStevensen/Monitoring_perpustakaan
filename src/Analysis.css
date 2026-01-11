@@ -1,0 +1,156 @@
+.analysis-page {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.analysis-page .page-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1e293b;
+}
+
+.analysis-page .page-header p {
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Filter Bar */
+.analysis-page .simple-filter {
+  margin: 25px 0;
+  display: flex;
+  gap: 15px;
+}
+
+.analysis-page .simple-filter select {
+  padding: 10px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+/* GRID LAYOUT UTAMA */
+.analysis-page .dashboard-grid {
+  display: grid;
+  /* Responsif: Otomatis mengisi kolom minimal lebar 280px */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* KARTU SENSOR */
+.analysis-page .sensor-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  border: 1px solid #f1f5f9;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.analysis-page .sensor-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* Styling Header Kartu */
+.analysis-page .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.analysis-page .card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.analysis-page .sample-count {
+  font-size: 0.75rem;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 20px;
+  color: #64748b;
+}
+
+/* Isi Statistik */
+.analysis-page .stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.analysis-page .stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.analysis-page .stat-item .label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.analysis-page .stat-item .value {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Statistik Utama (Rata-rata) lebih besar */
+.analysis-page .stat-item.main .value {
+  font-size: 2rem;
+}
+
+.analysis-page .stat-item.main .value small {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
+/* Mini Stats (Min/Max) di kanan */
+.analysis-page .mini-stats {
+  display: flex;
+  gap: 15px;
+  text-align: right;
+}
+
+.analysis-page .mini-stats .value {
+  font-size: 1.2rem;
+}
+
+/* TEMA WARNA PER SENSOR */
+/* Temperature (Blue) */
+.analysis-page .theme-blue .card-header h3 { color: #2563eb; }
+.analysis-page .theme-blue.sensor-card { border-top: 4px solid #2563eb; }
+
+/* Humidity (Green) */
+.analysis-page .theme-green .card-header h3 { color: #10b981; }
+.analysis-page .theme-green.sensor-card { border-top: 4px solid #10b981; }
+
+/* Light (Orange) */
+.analysis-page .theme-orange .card-header h3 { color: #f59e0b; }
+.analysis-page .theme-orange.sensor-card { border-top: 4px solid #f59e0b; }
+
+/* Sound (Purple) */
+.analysis-page .theme-purple .card-header h3 { color: #8b5cf6; }
+.analysis-page .theme-purple.sensor-card { border-top: 4px solid #8b5cf6; }
+
+.analysis-page .loading, .analysis-page .empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+}

@@ -89,6 +89,7 @@ function App(props) {
 
         <A href="/history" class="nav-button history-btn" activeClass="active">
         History</A>
+        <A href="/analysis" class="nav-button">Analisis</A>
       </div>
 
       <main class="content-area">
