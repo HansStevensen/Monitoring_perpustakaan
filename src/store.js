@@ -17,7 +17,8 @@ export function updateSensorData(roomId, tipe, nilai) {
     setGlobalData(roomId, tipe, (prev) => {
         const newData = {
             value: nilai,
-            time: waktuSekarang
+            time: waktuSekarang,
+            timestamp: Date.now()
         };
 
         const baru = [...prev, newData];
