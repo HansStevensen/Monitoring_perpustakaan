@@ -2,9 +2,13 @@ import {SerialPort} from "serialport";
 import mqtt from "mqtt";
 
 // --- KONFIGURASI ---
-const SERIAL_PORT = 'COM6'; // Ganti dengan PORT Arduino Base Station Anda
+const SERIAL_PORT = 'COM3'; // Ganti dengan PORT Arduino Base Station Anda
 const BAUD_RATE = 9600;
-const MQTT_BROKER = 'mqtt://localhost:1883'; // Alamat Mosquitto
+
+const MQTT_HOST = 'cfc4476f1be24988afb769aef8526aee.s1.eu.hivemq.cloud'; // Cek "Cluster URL" di dashboard
+const MQTT_USER = 'matchalatte';    // Username yang anda buat di Access Management
+const MQTT_PASS = 'Manuk123_';    // Password yang anda buat
+const MQTT_PORT = 8883;
 
 // --- KONSTANTA MQTT-SN (Sesuai Library Boriz) ---
 const TYPE_CONNECT   = 0x04;
@@ -23,11 +27,27 @@ let nextTopicId = 1;
 const port = new SerialPort({ path: SERIAL_PORT, baudRate: BAUD_RATE });
 console.log(`[GATEWAY] Membuka Serial di ${SERIAL_PORT}...`);
 
-// 2. Setup MQTT (Ke Mosquitto)
-const mqttClient = mqtt.connect(MQTT_BROKER);
+const mqttOptions = {
+    username: MQTT_USER,
+    password: MQTT_PASS,
+    port: MQTT_PORT,
+    protocol: 'mqtts', // Penting: Menggunakan 'mqtts' untuk koneksi aman (SSL)
+    rejectUnauthorized: true, // Pastikan sertifikat server valid
+};
+
+// Hubungkan client
+const mqttClient = mqtt.connect(`mqtts://${MQTT_HOST}`, mqttOptions);
 
 mqttClient.on('connect', () => {
-    console.log(`[GATEWAY] Terhubung ke Broker MQTT (${MQTT_BROKER})`);
+    console.log(`[GATEWAY] BERHASIL Terhubung ke HiveMQ Cloud!`);
+});
+
+mqttClient.on('error', (err) => {
+    console.error(`[GATEWAY] Error Koneksi MQTT:`, err.message);
+});
+
+mqttClient.on('offline', () => {
+    console.log(`[GATEWAY] Koneksi MQTT terputus, mencoba menyambung ulang...`);
 });
 
 // 3. Logika Utama: Membaca Data Serial
