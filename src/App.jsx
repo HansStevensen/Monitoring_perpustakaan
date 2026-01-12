@@ -31,34 +31,43 @@ function App(props) {
     Object.keys(globalData).forEach((roomId) => {
       const room = globalData[roomId];
       
-      // Filter: Hanya cek ruangan yang sedang tidak dibuka user
+      // Filter: Hanya cek ruangan yang sedang TIDAK dibuka user
+      // (Supaya notifikasi berjalan ini memberitahu kondisi ruangan SEBELAH)
       if (roomId !== activeRoomId) {
         
-        // 1. Cek Suhu (Range 20 - 26)
+        // 1. Cek Suhu
         if (room.suhu.length > 0) {
-          const val = room.suhu[room.suhu.length - 1];
+          // PERBAIKAN: Tambahkan .value karena data sekarang berbentuk Object
+          const val = room.suhu[room.suhu.length - 1].value; 
+          
           if (val > LIMITS.suhuMax) allIssues.push(`Suhu ${room.nama} PANAS (>26°C)`);
           if (val < LIMITS.suhuMin) allIssues.push(`Suhu ${room.nama} DINGIN (<20°C)`);
         }
 
-        // 2. Cek Kebisingan (Max 55)
+        // 2. Cek Kebisingan
         if (room.kebisingan.length > 0) {
-          const val = room.kebisingan[room.kebisingan.length - 1];
+          // PERBAIKAN: Tambahkan .value
+          const val = room.kebisingan[room.kebisingan.length - 1].value;
+          
           if (val > LIMITS.kebisinganMax) {
             allIssues.push(`Kebisingan di ${room.nama} (${val}dB)`);
           }
         }
 
-        // 3. Cek Kelembapan (Range 40 - 60)
+        // 3. Cek Kelembapan
         if (room.kelembapan.length > 0) {
-          const val = room.kelembapan[room.kelembapan.length - 1];
+          // PERBAIKAN: Tambahkan .value
+          const val = room.kelembapan[room.kelembapan.length - 1].value;
+          
           if (val > LIMITS.kelembapanMax) allIssues.push(`Kelembapan ${room.nama} TINGGI (>60%)`);
           if (val < LIMITS.kelembapanMin) allIssues.push(`Kelembapan ${room.nama} RENDAH (<40%)`);
         }
 
-        // 4. Cek Cahaya (Min 300)
+        // 4. Cek Cahaya
         if (room.cahaya.length > 0) {
-          const val = room.cahaya[room.cahaya.length - 1];
+          // PERBAIKAN: Tambahkan .value
+          const val = room.cahaya[room.cahaya.length - 1].value;
+          
           if (val < LIMITS.cahayaMin) {
             allIssues.push(`Cahaya ${room.nama} REDUP (<300 Lux)`);
           }
