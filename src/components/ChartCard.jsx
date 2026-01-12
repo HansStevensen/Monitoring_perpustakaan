@@ -30,7 +30,8 @@ export default function ChartCard(props) {
   const timeAgo = () => {
     const item = lastItem();
     
-    // Jika item tidak ada, atau property 'timestamp' tidak ada (Data Dummy)
+    // Pastikan item ada dan memiliki properti 'timestamp'
+    // (Note: Pastikan di store.js Anda juga menyimpan timestamp: Date.now())
     if (!item || !item.timestamp) return null; 
     
     // Hitung selisih: Waktu Sekarang - Waktu Data Masuk
@@ -38,15 +39,13 @@ export default function ChartCard(props) {
     return diff >= 0 ? diff : 0; // Cegah angka negatif
   };
 
-  // Cek apakah nilai melebihi batas (Limit)
+  // Cek apakah nilai melebihi batas (Limit) -> BOOLEAN (untuk warna chart)
   const hasError = () => {
     const val = lastValue();
     switch (props.title) {
-      // Suhu: Error jika Terlalu Panas ATAU Terlalu Dingin
       case "Suhu": 
         return val < LIMITS.suhuMin || val > LIMITS.suhuMax;
       
-      // Kelembapan: Error jika Terlalu Kering ATAU Terlalu Lembab
       case "Kelembapan": 
         return val < LIMITS.kelembapanMin || val > LIMITS.kelembapanMax;
         
@@ -58,6 +57,33 @@ export default function ChartCard(props) {
         
       default: return false;
     }
+  };
+
+  // --- LOGIKA PESAN ERROR SPESIFIK (BARU) ---
+  // Menentukan teks pesan berdasarkan jenis pelanggaran batas
+  const getErrorMessage = () => {
+    const val = lastValue();
+    
+    switch (props.title) {
+      case "Suhu":
+        if (val > LIMITS.suhuMax) return "Terlalu Panas!";
+        if (val < LIMITS.suhuMin) return "Terlalu Dingin!";
+        break;
+        
+      case "Kelembapan":
+        if (val > LIMITS.kelembapanMax) return "Terlalu Lembab!"; // Berisiko Jamur
+        if (val < LIMITS.kelembapanMin) return "Terlalu Kering!"; // Kertas Rapuh
+        break;
+        
+      case "Kebisingan":
+        if (val > LIMITS.kebisinganMax) return "Terlalu Bising!";
+        break;
+        
+      case "Cahaya":
+        if (val < LIMITS.cahayaMin) return "Kurang Cahaya!";
+        break;
+    }
+    return "Kondisi Tidak Ideal"; // Fallback default
   };
 
   const getUnit = () => {
@@ -118,7 +144,6 @@ export default function ChartCard(props) {
   };
 
   createEffect(() => {
-    // Hanya render chart jika mode = chart
     if (viewMode() === "chart" && canvasRef) {
       if (!chartInstance) {
         initChart();
@@ -136,7 +161,6 @@ export default function ChartCard(props) {
     }
   });
 
-  // Bersihkan Timer dan Chart saat komponen hilang
   onCleanup(() => {
     clearInterval(timer);
     if (chartInstance) {
@@ -166,10 +190,11 @@ export default function ChartCard(props) {
           </div>
         </Show>
 
-        {/* --- BADGE ERROR --- */}
+        {/* --- BADGE ERROR (UPDATED) --- */}
+        {/* Sekarang memanggil getErrorMessage() agar pesan lebih spesifik */}
         <Show when={hasError()}>
           <div class="error-badge">
-            {props.title === "Cahaya" ? "Kurang Terang!" : "Tidak Ideal!"}
+            {getErrorMessage()}
           </div>
         </Show>
 
@@ -180,7 +205,7 @@ export default function ChartCard(props) {
             "margin-top": "12px", 
             "text-align": "center",
             "font-weight": "600",
-            "font-family": "monospace" // Font monospace agar angka tidak goyang
+            "font-family": "monospace" 
         }}>
           {timeAgo() !== null 
             ? `Terakhir diubah: ${timeAgo()} detik yang lalu`
@@ -204,7 +229,6 @@ export default function ChartCard(props) {
           classList={{ active: viewMode() === "text" }}
           onClick={() => {
             setViewMode("text");
-            // Hancurkan chart instance agar tidak memakan memori di background
             if(chartInstance) {
                chartInstance.destroy();
                chartInstance = null;

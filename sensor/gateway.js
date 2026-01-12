@@ -2,7 +2,7 @@ import {SerialPort} from "serialport";
 import mqtt from "mqtt";
 
 // --- KONFIGURASI ---
-const SERIAL_PORT = 'COM3'; // Ganti dengan PORT Arduino Base Station Anda
+const SERIAL_PORT = 'COM6'; // Ganti dengan PORT Arduino Base Station Anda
 const BAUD_RATE = 9600;
 
 const MQTT_HOST = 'cfc4476f1be24988afb769aef8526aee.s1.eu.hivemq.cloud'; // Cek "Cluster URL" di dashboard
