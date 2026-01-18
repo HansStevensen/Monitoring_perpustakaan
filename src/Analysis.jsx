@@ -3,6 +3,7 @@ import { FLOORS } from "./data";
 import "./Analysis.css";
 
 // Fetch data dengan senseId='all'
+//ambil adar history dari api yang udah dibuat
 const fetchAllHistory = async ({floorId ,roomId, days }) => {
   const response = await fetch(
     `http://localhost:3000/api/history?floorId=${floorId}&roomId=${roomId}&senseId=all&days=${days}`
@@ -11,8 +12,9 @@ const fetchAllHistory = async ({floorId ,roomId, days }) => {
   return response.json();
 };
 
+
 export default function Analysis() {
-  const ROOMS = [
+  const ROOMS = [//masukin data semua rooms
     { id: "all", name: "Semua Ruangan", floorId: "all" },
     { id: 1, name: "Ruang Barat 1 (R01)", floorId: 1 },
     { id: 2, name: "Ruang Barat 2 (R02)", floorId: 1 },
@@ -41,7 +43,7 @@ export default function Analysis() {
     return ROOMS.filter(r => r.floorId === Number(selectedFloorId()) || r.id === "all");
   });
 
-  // 1. Fetch Data Mentah Campuran
+  //fetch data 
   const [data] = createResource(
     () => ({ 
         floorId: selectedFloorId(), 
@@ -51,7 +53,7 @@ export default function Analysis() {
     fetchAllHistory
   );
 
-  // 2. Logic Pengelompokan & Perhitungan Statistik
+  //Logic Pengelompokan & Perhitungan Statistik
   const sensorStats = createMemo(() => {
     const history = data();
     if (!history || history.length === 0) return [];
@@ -91,9 +93,9 @@ export default function Analysis() {
         <p>Statistik Sederhana Berdasarkan Periode</p>
       </header>
 
-      {/* Filter Row yang sudah diperbarui */}
+      {/*filter untuk historynya*/}
       <div class="simple-filter">
-        {/* Dropdown Lantai */}
+        {/*dropdown lantai  */}
         <select 
             value={selectedFloorId()} 
             onChange={(e) => {
@@ -105,12 +107,12 @@ export default function Analysis() {
           <For each={FLOORS}>{(f) => <option value={f.id}>{f.name}</option>}</For>
         </select>
 
-        {/* Dropdown Ruangan (Menggunakan filteredRooms) */}
+        {/* dropdown ruangan */}
         <select value={selectedRoomId()} onChange={(e) => setSelectedRoomId(e.target.value)}>
           <For each={filteredRooms()}>{(r) => <option value={r.id}>{r.name}</option>}</For>
         </select>
 
-        {/* Dropdown Rentang Waktu */}
+        {/* dropdown rentang waktu*/}
         <select value={timeRange()} onChange={(e) => setTimeRange(e.target.value)}>
           <option value="1">24 Jam Terakhir</option>
           <option value="7">7 Hari Terakhir</option>
@@ -127,7 +129,7 @@ export default function Analysis() {
           <div class="empty">Tidak ada data pada periode ini.</div>
         </Show>
 
-        {/* Looping Kartu Statistik per Sensor */}
+        {/*looping untuk munculin analisis card*/}
         <For each={sensorStats()}>
           {(stat) => (
             <div class={`sensor-card theme-${stat.color}`}>

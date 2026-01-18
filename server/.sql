@@ -1,4 +1,4 @@
--- 1. Buat tabel referensi utama dulu (Lantai & Jenis Sensor)
+-- create tabel yang dibutuhin
 CREATE TABLE floors (
     id SERIAL PRIMARY KEY,
     floor_name VARCHAR(50) NOT NULL
@@ -9,7 +9,6 @@ CREATE TABLE senseTable (
     sense_name VARCHAR(100) NOT NULL
 );
 
--- 2. Buat tabel ruangan (Sudah include floor_id)
 CREATE TABLE rooms (
     id SERIAL PRIMARY KEY,
     room_name VARCHAR(100) NOT NULL,
@@ -17,7 +16,7 @@ CREATE TABLE rooms (
     CONSTRAINT fk_floor FOREIGN KEY (floor_id) REFERENCES floors(id)
 );
 
--- 3. Buat tabel transaksi (Sensing)
+-- buat tabel transisi 
 CREATE TABLE sensing (
     id SERIAL PRIMARY KEY,
     sense_id INT NOT NULL,
@@ -28,21 +27,21 @@ CREATE TABLE sensing (
     CONSTRAINT fk_sense FOREIGN KEY (sense_id) REFERENCES senseTable(id)
 );
 
---- ISI DATA ---
 
--- Masukkan Lantai
+--masukin data 
+--akan ada 2 lantai dan 4 sensor
 INSERT INTO floors (id, floor_name) VALUES 
 (1, 'Lantai 1'), 
 (2, 'Lantai 2');
 
--- Masukkan Jenis Sensor
+
 INSERT INTO senseTable (id, sense_name) VALUES
 (1, 'temperature'),
 (2, 'humidity'),
 (3, 'light_intensity'),
 (4, 'sound_proof');
 
--- Masukkan 8 Ruangan (4 di Lantai 1, 4 di Lantai 2)
+--masukin data ruangan
 INSERT INTO rooms (id, room_name, floor_id) VALUES
 (1, 'Ruang Barat 1 (R01)', 1),
 (2, 'Ruang Barat 2 (R02)', 1),
@@ -53,9 +52,9 @@ INSERT INTO rooms (id, room_name, floor_id) VALUES
 (7, 'Ruang Diskusi A (R07)', 2),
 (8, 'Ruang Diskusi B (R08)', 2);
 
--- Masukkan Contoh Data Awal
+--contoh data
 INSERT INTO sensing (sense_id, sense_value, room_id) VALUES
 (1, 22.5, 1),
 (2, 45.0, 1),
-(1, 23.0, 5), -- Contoh data di Lantai 2
+(1, 23.0, 5), 
 (2, 50.0, 5);

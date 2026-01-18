@@ -85,7 +85,6 @@ export default function History() {
           </select>
         </div>
 
-        {/* 4. GUNAKAN filteredRooms() BUKAN ROOMS */}
         <div class="filter-item">
           <label>Lokasi Ruangan</label>
           <select value={selectedRoomId()} onChange={(e) => setSelectedRoomId(e.target.value)}>

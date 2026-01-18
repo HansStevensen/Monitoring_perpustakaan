@@ -14,7 +14,7 @@ function App(props) {
   const [activeFloor, setActiveFloor] = createSignal(1);
   const navigate = useNavigate();
 
-  // --- 1. LOGIKA KONEKSI SOCKET.IO ---
+ //logika connect socket io
   createEffect(() => {
     const socket = io("http://localhost:3000");
     socket.on("connect", () => {
@@ -26,7 +26,7 @@ function App(props) {
     return () => socket.disconnect();
   });
 
-  // --- 2. LOGIKA ALERT GLOBAL (LENGKAP 4 SENSOR) ---
+  //logika alert global untuk 4 sensor
   const finalMessage = createMemo(() => {
     let allIssues = [];
     const activeRoomId = location.pathname.replace("/", "").toUpperCase();
@@ -40,7 +40,6 @@ function App(props) {
         
         // 1. Cek Suhu
         if (room.suhu.length > 0) {
-          // PERBAIKAN: Tambahkan .value karena data sekarang berbentuk Object
           const val = room.suhu[room.suhu.length - 1].value; 
           
           if (val > LIMITS.suhuMax) allIssues.push(`Suhu ${room.nama} PANAS (>26°C)`);
@@ -49,7 +48,6 @@ function App(props) {
 
         // 2. Cek Kebisingan
         if (room.kebisingan.length > 0) {
-          // PERBAIKAN: Tambahkan .value
           const val = room.kebisingan[room.kebisingan.length - 1].value;
           
           if (val > LIMITS.kebisinganMax) {
@@ -59,7 +57,6 @@ function App(props) {
 
         // 3. Cek Kelembapan
         if (room.kelembapan.length > 0) {
-          // PERBAIKAN: Tambahkan .value
           const val = room.kelembapan[room.kelembapan.length - 1].value;
           
           if (val > LIMITS.kelembapanMax) allIssues.push(`Kelembapan ${room.nama} TINGGI (>60%)`);
@@ -68,7 +65,6 @@ function App(props) {
 
         // 4. Cek Cahaya
         if (room.cahaya.length > 0) {
-          // PERBAIKAN: Tambahkan .value
           const val = room.cahaya[room.cahaya.length - 1].value;
           
           if (val < LIMITS.cahayaMin) {
@@ -81,18 +77,19 @@ function App(props) {
     return allIssues.length > 0 ? allIssues.join("   |   ") : null;
   });
 
-  // --- 1. LOGIKA RESET LANTAI SAAT RUBAH ROUTE ---
+  //logika reset lantai ketika route nya keubah
   createEffect(() => {
-    // Jika path saat ini adalah history atau analysis, matikan active floor
+    //kalo path nya di history atau analysis maka si activate floor nya akan diberi nilai null
+    //agar tampilan lebih bagus
     if (location.pathname === "/history" || location.pathname === "/analysis") {
       setActiveFloor(null);
     }
   });
 
-  // --- 2. FUNGSI KLIK LANTAI ---
+  //fungsi untuk klik lantai
   const handleFloorClick = (floorId) => {
     setActiveFloor(floorId);
-    // Jika sedang di history atau analysis, paksa pindah ke halaman utama (/)
+    //kalau lagi ada di path history atau analysis kita ganti dlu ke / 
     if (location.pathname === "/history" || location.pathname === "/analysis") {
       navigate("/");
     }
@@ -100,18 +97,17 @@ function App(props) {
 
   return (
     <div class="app-container">
-      {/* 1. Alert Section */}
+      {/* alert */}
       <Show when={finalMessage()}>
         <RunningAlert message={finalMessage()} />
       </Show>
 
-      {/* 2. Header */}
+      {/* header */}
       <header class="app-header">
         <h1 class="app-title">Monitoring IoT Perpustakaan</h1>
         <p class="app-subtitle">Real-time Data via MQTT & WebSocket</p>
       </header>
 
-      {/* 3. MENU UTAMA (Lantai + History + Analisis dalam satu baris) */}
       <div class="top-nav-bar">
         {/* Tombol Lantai */}
         <For each={FLOORS}>{(floor) => (
@@ -123,7 +119,6 @@ function App(props) {
           </button>
         )}</For>
 
-        {/* Garis Pemisah Kecil */}
         <div class="nav-divider"></div>
 
         {/* Tombol Menu Global */}
@@ -131,7 +126,7 @@ function App(props) {
         <A href="/analysis" class="nav-button" activeClass="active">Analisis</A>
       </div>
 
-      {/* 4. NAVIGASI RUANGAN (Baris Kedua - Hanya muncul jika lantai dipilih) */}
+      {/*navigasi untuk ruangan, harus pilih lantia dulu baru munncul pilihan roomnya */}
       <div class="room-nav-container">
         <Show 
           when={activeFloor()} 
