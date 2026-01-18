@@ -1,7 +1,8 @@
 /* src/App.jsx */
-import { createEffect, Show, createMemo } from "solid-js";
-import { A, useLocation } from "@solidjs/router";
+import { createEffect, Show, createMemo,createSignal,For } from "solid-js";
+import { A, useLocation,useNavigate} from "@solidjs/router";
 import io from "socket.io-client";
+import { FLOORS } from "./data";
 
 import RunningAlert from "./components/RunningAlert";
 import { updateSensorData, globalData } from "./store"; 
@@ -10,6 +11,8 @@ import "./App.css";
 
 function App(props) {
   const location = useLocation();
+  const [activeFloor, setActiveFloor] = createSignal(1);
+  const navigate = useNavigate();
 
   // --- 1. LOGIKA KONEKSI SOCKET.IO ---
   createEffect(() => {
@@ -78,31 +81,76 @@ function App(props) {
     return allIssues.length > 0 ? allIssues.join("   |   ") : null;
   });
 
+  // --- 1. LOGIKA RESET LANTAI SAAT RUBAH ROUTE ---
+  createEffect(() => {
+    // Jika path saat ini adalah history atau analysis, matikan active floor
+    if (location.pathname === "/history" || location.pathname === "/analysis") {
+      setActiveFloor(null);
+    }
+  });
+
+  // --- 2. FUNGSI KLIK LANTAI ---
+  const handleFloorClick = (floorId) => {
+    setActiveFloor(floorId);
+    // Jika sedang di history atau analysis, paksa pindah ke halaman utama (/)
+    if (location.pathname === "/history" || location.pathname === "/analysis") {
+      navigate("/");
+    }
+  };
+
   return (
     <div class="app-container">
+      {/* 1. Alert Section */}
       <Show when={finalMessage()}>
         <RunningAlert message={finalMessage()} />
       </Show>
 
+      {/* 2. Header */}
       <header class="app-header">
         <h1 class="app-title">Monitoring IoT Perpustakaan</h1>
         <p class="app-subtitle">Real-time Data via MQTT & WebSocket</p>
       </header>
 
-      <div class="nav-container">
-        {Object.keys(globalData).map((id) => (
-          <A href={`/${id}`} class="nav-button" activeClass="active" end>
-            {globalData[id].nama}
-          </A>
-        ))}
+      {/* 3. MENU UTAMA (Lantai + History + Analisis dalam satu baris) */}
+      <div class="top-nav-bar">
+        {/* Tombol Lantai */}
+        <For each={FLOORS}>{(floor) => (
+          <button 
+            class={`nav-button ${activeFloor() === floor.id ? 'active' : ''}`}
+            onClick={() => handleFloorClick(floor.id)}
+          >
+            {floor.name}
+          </button>
+        )}</For>
 
-        <A href="/history" class="nav-button history-btn" activeClass="active">
-        History</A>
-        <A href="/analysis" class="nav-button">Analisis</A>
+        {/* Garis Pemisah Kecil */}
+        <div class="nav-divider"></div>
+
+        {/* Tombol Menu Global */}
+        <A href="/history" class="nav-button" activeClass="active">History</A>
+        <A href="/analysis" class="nav-button" activeClass="active">Analisis</A>
+      </div>
+
+      {/* 4. NAVIGASI RUANGAN (Baris Kedua - Hanya muncul jika lantai dipilih) */}
+      <div class="room-nav-container">
+        <Show 
+          when={activeFloor()} 
+          fallback={<p class="select-prompt">Pilih lantai untuk memantau ruangan secara spesifik</p>}
+        >
+          <div class="room-buttons">
+            <For each={Object.keys(globalData).filter(id => globalData[id].floorId === activeFloor())}>
+              {(id) => (
+                <A href={`/${id}`} class="nav-button room-btn" activeClass="active">
+                  {globalData[id].nama}
+                </A>
+              )}
+            </For>
+          </div>
+        </Show>
       </div>
 
       <main class="content-area">
-        {props.children} 
+        {props.children}
       </main>
     </div>
   );

@@ -1,10 +1,11 @@
 import { createSignal, createResource, For, Show, createMemo } from "solid-js";
+import { FLOORS } from "./data";
 import "./Analysis.css";
 
 // Fetch data dengan senseId='all'
-const fetchAllHistory = async ({ roomId, days }) => {
+const fetchAllHistory = async ({floorId ,roomId, days }) => {
   const response = await fetch(
-    `http://localhost:3000/api/history?roomId=${roomId}&senseId=all&days=${days}`
+    `http://localhost:3000/api/history?floorId=${floorId}&roomId=${roomId}&senseId=all&days=${days}`
   );
   if (!response.ok) throw new Error("Gagal mengambil data");
   return response.json();
@@ -12,9 +13,15 @@ const fetchAllHistory = async ({ roomId, days }) => {
 
 export default function Analysis() {
   const ROOMS = [
-    { id: "all", name: "Semua Ruangan" },
-    { id: 1, name: "Ruang Barat (R01)" },
-    { id: 2, name: "Ruang Selatan (R02)" }
+    { id: "all", name: "Semua Ruangan", floorId: "all" },
+    { id: 1, name: "Ruang Barat 1 (R01)", floorId: 1 },
+    { id: 2, name: "Ruang Barat 2 (R02)", floorId: 1 },
+    { id: 3, name: "Ruang Timur 1 (R03)", floorId: 1 },
+    { id: 4, name: "Ruang Timur 2 (R04)", floorId: 1 },
+    { id: 5, name: "Ruang Koleksi Umum (R05)", floorId: 2 },
+    { id: 6, name: "Ruang Belajar Mandiri (R06)", floorId: 2 },
+    { id: 7, name: "Ruang Diskusi A (R07)", floorId: 2 },
+    { id: 8, name: "Ruang Diskusi B (R08)", floorId: 2 }
   ];
 
   // Metadata Sensor untuk label dan satuan
@@ -25,12 +32,22 @@ export default function Analysis() {
     4: { name: "KEBISINGAN", unit: "dB", color: "purple" }
   };
 
+  const [selectedFloorId, setSelectedFloorId] = createSignal("all");
   const [selectedRoomId, setSelectedRoomId] = createSignal("all");
   const [timeRange, setTimeRange] = createSignal("30"); // Default 30 hari
 
+  const filteredRooms = createMemo(() => {
+    if (selectedFloorId() === "all") return ROOMS;
+    return ROOMS.filter(r => r.floorId === Number(selectedFloorId()) || r.id === "all");
+  });
+
   // 1. Fetch Data Mentah Campuran
   const [data] = createResource(
-    () => ({ roomId: selectedRoomId(), days: timeRange() }),
+    () => ({ 
+        floorId: selectedFloorId(), 
+        roomId: selectedRoomId(), 
+        days: timeRange() 
+    }),
     fetchAllHistory
   );
 
@@ -71,15 +88,29 @@ export default function Analysis() {
     <div class="analysis-page">
       <header class="page-header">
         <h1>Analisis</h1>
-        <p>Statistik Sederhana</p>
+        <p>Statistik Sederhana Berdasarkan Periode</p>
       </header>
 
-      {/* Filter Sederhana (Hanya Ruangan & Waktu) */}
+      {/* Filter Row yang sudah diperbarui */}
       <div class="simple-filter">
-        <select value={selectedRoomId()} onChange={(e) => setSelectedRoomId(e.target.value)}>
-          <For each={ROOMS}>{(r) => <option value={r.id}>{r.name}</option>}</For>
+        {/* Dropdown Lantai */}
+        <select 
+            value={selectedFloorId()} 
+            onChange={(e) => {
+                setSelectedFloorId(e.target.value);
+                setSelectedRoomId("all"); // Reset ruangan jika lantai berubah
+            }}
+        >
+          <option value="all">Semua Lantai</option>
+          <For each={FLOORS}>{(f) => <option value={f.id}>{f.name}</option>}</For>
         </select>
 
+        {/* Dropdown Ruangan (Menggunakan filteredRooms) */}
+        <select value={selectedRoomId()} onChange={(e) => setSelectedRoomId(e.target.value)}>
+          <For each={filteredRooms()}>{(r) => <option value={r.id}>{r.name}</option>}</For>
+        </select>
+
+        {/* Dropdown Rentang Waktu */}
         <select value={timeRange()} onChange={(e) => setTimeRange(e.target.value)}>
           <option value="1">24 Jam Terakhir</option>
           <option value="7">7 Hari Terakhir</option>
