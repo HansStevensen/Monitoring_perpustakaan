@@ -32,21 +32,19 @@ git clone https://github.com/HansStevensen/Monitoring_perpustakaan
 cd Monitoring_perpustakaan
 
 # Install dependensi
+```bash
 npm install
-
-npm install dotenv
+npm run dev
+```
 
 3. Konfigurasi Environment Variables
 
 Buat file .env di root direktori proyek dengan isi berikut:
 
-DB_USER=postgres
-
-DB_HOST=localhost
-
-DB_NAME=perpustakaan_iot
-
-DB_USER_PASSWORD=postgres
+- DB_USER=postgres
+- DB_HOST=localhost
+- DB_NAME=perpustakaan_iot
+- DB_USER_PASSWORD=postgres
 
 Catatan: Sesuaikan nilai-nilai tersebut dengan konfigurasi database PostgreSQL Anda.
 
@@ -56,13 +54,15 @@ Pastikan PostgreSQL service sedang berjalan
 
 Buat database sesuai dengan nama yang didefinisikan di file .env (default: perpustakaan_iot)
 
-Jalankan file SQL yang disediakan dalam proyek untuk membuat tabel-tabel yang diperlukan
+Jalankan file SQL (.sql) yang disediakan dalam proyek untuk membuat tabel-tabel yang diperlukan
 
 5. Mode Pengembangan (Development)
 
 Jalankan server pengembangan lokal dengan fitur Hot Module Replacement (HMR) untuk kemudahan live-reloading saat Anda melakukan perubahan pada kode:
 
+```bash
 npm run dev
+```
 
 Aplikasi akan tersedia dan dapat diakses melalui browser Anda pada alamat berikut: http://localhost:5173.
 
@@ -70,6 +70,8 @@ Aplikasi akan tersedia dan dapat diakses melalui browser Anda pada alamat beriku
 
 Untuk membuat build statis yang siap di-deploy ke lingkungan produksi, jalankan perintah build:
 
-npm run build
+```bash
+npm build
+```
 
 Hasil build yang telah dioptimalkan akan tersimpan dalam direktori dist. File ini siap untuk di-hosting di server manapun.
