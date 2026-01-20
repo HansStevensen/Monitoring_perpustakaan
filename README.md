@@ -40,11 +40,12 @@ npm run dev
 3. Konfigurasi Environment Variables
 
 Buat file .env di root direktori proyek dengan isi berikut:
-
-- DB_USER=postgres
-- DB_HOST=localhost
-- DB_NAME=perpustakaan_iot
-- DB_USER_PASSWORD=postgres
+```bash
+DB_USER=postgres
+DB_HOST=localhost
+DB_NAME=perpustakaan_iot
+DB_USER_PASSWORD=postgres
+```
 
 Catatan: Sesuaikan nilai-nilai tersebut dengan konfigurasi database PostgreSQL Anda.
 
