@@ -10,12 +10,10 @@ export default function ChartCard(props) {
   let canvasRef;
   let chartInstance = null;
 
-  // --- 1. TIMER DETAK JANTUNG (Update setiap 1 detik) ---
+ //timer tiap 1 deitk
   const timer = setInterval(() => {
     setNow(Date.now());
   }, 1000);
-
-  // --- 2. HELPER DATA ---
   
   // Ambil item terakhir dari array data
   const lastItem = () => {
@@ -23,15 +21,14 @@ export default function ChartCard(props) {
     return props.data[props.data.length - 1];
   };
   
-  // Ambil nilainya saja (aman jika null)
+  //ambil data
   const lastValue = () => lastItem()?.value ?? 0;
 
-  // --- 3. LOGIKA HITUNG WAKTU (Time Ago) ---
+  //logika untuk hitung waktu (ago)
   const timeAgo = () => {
     const item = lastItem();
     
-    // Pastikan item ada dan memiliki properti 'timestamp'
-    // (Note: Pastikan di store.js Anda juga menyimpan timestamp: Date.now())
+    // item harus punya properti timestamp
     if (!item || !item.timestamp) return null; 
     
     // Hitung selisih: Waktu Sekarang - Waktu Data Masuk
@@ -59,8 +56,7 @@ export default function ChartCard(props) {
     }
   };
 
-  // --- LOGIKA PESAN ERROR SPESIFIK (BARU) ---
-  // Menentukan teks pesan berdasarkan jenis pelanggaran batas
+  //logika error akan punya 2 batasan maksimal dan juga minimal
   const getErrorMessage = () => {
     const val = lastValue();
     
@@ -71,8 +67,8 @@ export default function ChartCard(props) {
         break;
         
       case "Kelembapan":
-        if (val > LIMITS.kelembapanMax) return "Terlalu Lembab!"; // Berisiko Jamur
-        if (val < LIMITS.kelembapanMin) return "Terlalu Kering!"; // Kertas Rapuh
+        if (val > LIMITS.kelembapanMax) return "Terlalu Lembab!";
+        if (val < LIMITS.kelembapanMin) return "Terlalu Kering!";
         break;
         
       case "Kebisingan":
@@ -96,7 +92,7 @@ export default function ChartCard(props) {
     }
   };
 
-  // --- 4. LOGIKA CHART.JS ---
+  // logika dari chartjs
   const initChart = () => {
     if (!canvasRef) return;
     if (chartInstance) chartInstance.destroy();
@@ -148,11 +144,11 @@ export default function ChartCard(props) {
       if (!chartInstance) {
         initChart();
       } else {
-        // Update Data Real-time
+        // update data secara realtime
         chartInstance.data.labels = props.data.map(d => d.time);
         chartInstance.data.datasets[0].data = props.data.map(d => d.value);
         
-        // Update Warna (Merah jika error)
+        // kalo ada error maka warnanya akan di update jadi merah
         chartInstance.data.datasets[0].borderColor = hasError() ? "#ef4444" : "#2563eb";
         chartInstance.data.datasets[0].backgroundColor = hasError() ? "rgba(239, 68, 68, 0.2)" : "rgba(37, 99, 235, 0.2)";
         
@@ -174,7 +170,6 @@ export default function ChartCard(props) {
       <div class="chart-card" classList={{ "is-error": hasError() }}>
         <h3 class="chart-title">{props.title}</h3>
 
-        {/* --- TAMPILAN UTAMA (GRAFIK ATAU ANGKA) --- */}
         <Show 
           when={viewMode() === "chart"} 
           fallback={
@@ -190,8 +185,6 @@ export default function ChartCard(props) {
           </div>
         </Show>
 
-        {/* --- BADGE ERROR (UPDATED) --- */}
-        {/* Sekarang memanggil getErrorMessage() agar pesan lebih spesifik */}
         <Show when={hasError()}>
           <div class="error-badge">
             {getErrorMessage()}

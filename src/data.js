@@ -1,21 +1,22 @@
 /* src/data.js */
+
+export const FLOORS = [
+  { id: 1, name: "Lantai 1" },
+  { id: 2, name: "Lantai 2" }
+];
+
 export const DATA_PERPUSTAKAAN = {
-  "R01": {
-    nama: "Ruang Barat",
-    labels: [], 
-    suhu: [],
-    kelembapan: [],
-    cahaya: [],
-    kebisingan: []
-  },
-  "R02": {
-    nama: "Ruang Selatan",
-    labels: [],
-    suhu: [],
-    kelembapan: [],
-    cahaya: [],
-    kebisingan: []
-  }
+  // LANTAI 1
+  "R01": { nama: "Ruang Barat 1", floorId: 1, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] },
+  "R02": { nama: "Ruang Barat 2", floorId: 1, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] },
+  "R03": { nama: "Ruang Timur 1", floorId: 1, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] },
+  "R04": { nama: "Ruang Timur 2", floorId: 1, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] },
+  
+  // LANTAI 2
+  "R05": { nama: "Ruang Koleksi Umum", floorId: 2, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] },
+  "R06": { nama: "Ruang Belajar Mandiri", floorId: 2, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] },
+  "R07": { nama: "Ruang Diskusi A", floorId: 2, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] },
+  "R08": { nama: "Ruang Diskusi B", floorId: 2, suhu: [], kelembapan: [], cahaya: [], kebisingan: [] }
 };
 
 // UPDATE SESUAI REGULASI (Permenkes & SNI)

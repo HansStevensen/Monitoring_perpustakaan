@@ -5,7 +5,8 @@ import express from "express";
 import http from "node:http";
 import { Server } from "socket.io";
 import cors from "cors";
-import pool from "./db.js"; // Memakai koneksi database dari temanmu
+import pool from "./db.js"; 
+
 
 const app = express();
 app.use(cors());
@@ -18,11 +19,13 @@ const io = new Server(server, {
   }
 });
 
-/**
- * MAPPING DATA
- * Mengonversi string dari MQTT ke ID Database (Sesuai tabel SQL kamu)
- */
-const ROOM_MAP = { "R01": 1, "R02": 2 }; 
+
+//konversi string dari mqtt ke id dari database
+const ROOM_MAP = { 
+  "R01": 1, "R02": 2, "R03": 3, "R04": 4,//room lt 1
+  "R05": 5, "R06": 6, "R07": 7, "R08": 8  //room lt2
+};
+//id sensor
 const SENSE_MAP = { 
   "suhu": 1, 
   "kelembapan": 2, 
@@ -30,7 +33,7 @@ const SENSE_MAP = {
   "kebisingan": 4 
 };
 
-// --- 1. KONEKSI MQTT ---
+//cara konversi mqtt
 const MQTT_HOST = 'cfc4476f1be24988afb769aef8526aee.s1.eu.hivemq.cloud'; // Cek "Cluster URL" di dashboard
 const MQTT_USER = 'matchalatte';    // Username yang anda buat di Access Management
 const MQTT_PASS = 'Manuk123_';    // Password yang anda buat
@@ -68,10 +71,10 @@ mqttClient.on('message', async (topic, message) => {
         const roomCode = parts[1]; // "R01"
         const typeStr = parts[2];  // "suhu"
         
-        // A. Kirim Real-time ke Dashboard (Socket.io)
+        //kirim data langsung ke dashboard
         io.emit('updateSensor', { roomId: roomCode, tipe: typeStr, nilai: nilai });
 
-        // B. Simpan ke Database (PostgreSQL)
+        //simpan ke dalam database
         const roomId = ROOM_MAP[roomCode];
         const senseId = SENSE_MAP[typeStr];
 
@@ -88,33 +91,33 @@ mqttClient.on('message', async (topic, message) => {
     }
 });
 
-// --- 2. ENDPOINT API HISTORY ---
+//endpoint api history untuk fitur history
 app.get('/api/history', async (req, res) => {
-    const { roomId, senseId, days } = req.query;
+    //ada 4 filter utama yaitu floor,room,sensor, dan hari
+    const { floorId, roomId, senseId, days } = req.query;
 
     try {
-        /**
-         * Logika Query Dinamis:
-         * Menggunakan trik ($1 = 'all' OR ...) agar filter "Semua" berfungsi
-         */
         const queryText = `
-            SELECT recorded_at, sense_value, room_id, sense_id
-            FROM sensing 
-            WHERE ($1 = 'all' OR room_id = $1::int)
-            AND ($2 = 'all' OR sense_id = $2::int)
-            AND ($3 = 'all' OR recorded_at >= NOW() - ($3 || ' day')::INTERVAL)
-            ORDER BY recorded_at DESC
+            SELECT s.recorded_at, s.sense_value, s.room_id, s.sense_id, r.floor_id
+            FROM sensing s
+            JOIN rooms r ON s.room_id = r.id
+            WHERE ($1 = 'all' OR r.floor_id = $1::int)
+            AND ($2 = 'all' OR s.room_id = $2::int)
+            AND ($3 = 'all' OR s.sense_id = $3::int)
+            AND ($4 = 'all' OR s.recorded_at >= NOW() - ($4 || ' day')::INTERVAL)
+            ORDER BY s.recorded_at DESC
             LIMIT 500;
         `;
         
-        const result = await pool.query(queryText, [roomId, senseId, days]);
+        // Kirim 4 parameter ke query
+        const result = await pool.query(queryText, [floorId, roomId, senseId, days]);
         res.json(result.rows);
     } catch (err) {
-        console.error('❌ DB Select Error:', err.message);
+        console.error('DB Select Error:', err.message);
         res.status(500).json({ error: "Gagal mengambil riwayat" });
     }
 });
 
 server.listen(3000, () => {
-    console.log('🚀 Server berjalan di http://localhost:3000');
+    console.log('Server berjalan di http://localhost:3000');
 });
