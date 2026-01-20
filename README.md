@@ -18,31 +18,40 @@ Oleh karena itu, perlu dibangun suatu aplikasi pemantauan kebisingan dan pencaha
 
 ## Instalasi dan Konfigurasi
 1. Prasyarat
+
 Pastikan Anda telah menginstal Node.js dan PostgreSQL di sistem Anda.
 
 2. Instalasi Dependensi
+
 Kloning repositori proyek dan instal semua dependensi yang diperlukan:
 
-bash
 # Kloning repositori
+
 git clone https://github.com/HansStevensen/Monitoring_perpustakaan
+
 cd Monitoring_perpustakaan
 
 # Install dependensi
 npm install
+
 npm install dotenv
 
 3. Konfigurasi Environment Variables
+
 Buat file .env di root direktori proyek dengan isi berikut:
 
-env
 DB_USER=postgres
+
 DB_HOST=localhost
+
 DB_NAME=perpustakaan_iot
+
 DB_USER_PASSWORD=postgres
+
 Catatan: Sesuaikan nilai-nilai tersebut dengan konfigurasi database PostgreSQL Anda.
 
 4. Setup Database
+
 Pastikan PostgreSQL service sedang berjalan
 
 Buat database sesuai dengan nama yang didefinisikan di file .env (default: perpustakaan_iot)
@@ -50,6 +59,7 @@ Buat database sesuai dengan nama yang didefinisikan di file .env (default: perpu
 Jalankan file SQL yang disediakan dalam proyek untuk membuat tabel-tabel yang diperlukan
 
 5. Mode Pengembangan (Development)
+
 Jalankan server pengembangan lokal dengan fitur Hot Module Replacement (HMR) untuk kemudahan live-reloading saat Anda melakukan perubahan pada kode:
 
 npm run dev
@@ -57,7 +67,9 @@ npm run dev
 Aplikasi akan tersedia dan dapat diakses melalui browser Anda pada alamat berikut: http://localhost:5173.
 
 6. Produksi (Building for Production)
+
 Untuk membuat build statis yang siap di-deploy ke lingkungan produksi, jalankan perintah build:
 
 npm run build
+
 Hasil build yang telah dioptimalkan akan tersimpan dalam direktori dist. File ini siap untuk di-hosting di server manapun.
