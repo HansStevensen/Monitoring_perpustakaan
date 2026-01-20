@@ -2,15 +2,16 @@ import {SerialPort} from "serialport";
 import mqtt from "mqtt";
 
 // --- KONFIGURASI ---
-const SERIAL_PORT = 'COM6'; // Ganti dengan PORT Arduino Base Station Anda
+const SERIAL_PORT = 'COM6'; 
 const BAUD_RATE = 9600;
 
-const MQTT_HOST = 'cfc4476f1be24988afb769aef8526aee.s1.eu.hivemq.cloud'; // Cek "Cluster URL" di dashboard
-const MQTT_USER = 'matchalatte';    // Username yang anda buat di Access Management
-const MQTT_PASS = 'Manuk123_';    // Password yang anda buat
-const MQTT_PORT = 8883;
+// --- SETTING MOSQUITTO LOKAL ---
+const MQTT_HOST = 'localhost'; // Gunakan localhost
+const MQTT_PORT = 1883;        // Port default tanpa SSL
+const MQTT_USER = '';          // Kosongkan jika tidak pakai password
+const MQTT_PASS = '';          // Kosongkan jika tidak pakai password
 
-// --- KONSTANTA MQTT-SN (Sesuai Library Boriz) ---
+// --- KONSTANTA MQTT-SN ---
 const TYPE_CONNECT   = 0x04;
 const TYPE_CONNACK   = 0x05;
 const TYPE_REGISTER  = 0x0A;
@@ -20,116 +21,87 @@ const TYPE_PINGREQ   = 0x16;
 const TYPE_PINGRESP  = 0x17;
 
 // Variable Global
-let topicMap = {}; // Menyimpan { TopicID: "NamaTopik" }
+let topicMap = {}; 
 let nextTopicId = 1;
 
-// 1. Setup Serial (Ke Arduino)
+// 1. Setup Serial
 const port = new SerialPort({ path: SERIAL_PORT, baudRate: BAUD_RATE });
 console.log(`[GATEWAY] Membuka Serial di ${SERIAL_PORT}...`);
 
+// 2. Setup MQTT (Updated for Mosquitto)
 const mqttOptions = {
-    username: MQTT_USER,
-    password: MQTT_PASS,
     port: MQTT_PORT,
-    protocol: 'mqtts', // Penting: Menggunakan 'mqtts' untuk koneksi aman (SSL)
-    rejectUnauthorized: true, // Pastikan sertifikat server valid
+    protocol: 'mqtt', 
 };
 
-// Hubungkan client
-const mqttClient = mqtt.connect(`mqtts://${MQTT_HOST}`, mqttOptions);
+// Tambahkan user/pass hanya jika diisi
+if (MQTT_USER) mqttOptions.username = MQTT_USER;
+if (MQTT_PASS) mqttOptions.password = MQTT_PASS;
+
+// Hubungkan client (Perhatikan: mqtt:// bukan mqtts://)
+const mqttClient = mqtt.connect(`mqtt://${MQTT_HOST}`, mqttOptions);
 
 mqttClient.on('connect', () => {
-    console.log(`[GATEWAY] BERHASIL Terhubung ke HiveMQ Cloud!`);
+    console.log(`[GATEWAY] BERHASIL Terhubung ke Mosquitto Lokal!`);
 });
 
 mqttClient.on('error', (err) => {
     console.error(`[GATEWAY] Error Koneksi MQTT:`, err.message);
 });
 
-mqttClient.on('offline', () => {
-    console.log(`[GATEWAY] Koneksi MQTT terputus, mencoba menyambung ulang...`);
-});
-
-// 3. Logika Utama: Membaca Data Serial
-let buffer = Buffer.alloc(0); // Buffer penampung data pecahan
+// ... (Sisa kode logika Buffer dan handleMqttSnPacket SAMA PERSIS seperti sebelumnya)
+let buffer = Buffer.alloc(0); 
 port.on('data', (chunk) => {
-    // Gabungkan data baru ke buffer
     buffer = Buffer.concat([buffer, chunk]);
-
-    // Proses paket selama buffer cukup panjang
     while (buffer.length > 0) {
-        const len = buffer[0]; // Byte pertama adalah Panjang Paket
-
-        // Validasi: Jika panjang paket valid (tidak 0) dan data sudah lengkap
+        const len = buffer[0]; 
         if (len > 0 && buffer.length >= len) {
-            // Potong paket dari buffer
             const packet = buffer.subarray(0, len);
-            buffer = buffer.subarray(len); // Sisanya disimpan untuk loop berikutnya
-
+            buffer = buffer.subarray(len); 
             handleMqttSnPacket(packet);
         } else {
-            // Data belum lengkap, tunggu chunk berikutnya
             break;
         }
     }
 });
 
-// Fungsi untuk menangani Paket MQTT-SN
 function handleMqttSnPacket(packet) {
-    const msgType = packet[1]; // Byte kedua adalah Tipe Pesan
+    const msgType = packet[1]; 
 
-    // --- KASUS 1: Arduino minta CONNECT ---
     if (msgType === TYPE_CONNECT) {
         console.log("[RECV] CONNECT Request");
-        // Balas CONNACK: [Len=3, Type=0x05, ReturnCode=0x00]
         const connack = Buffer.from([0x03, TYPE_CONNACK, 0x00]);
         port.write(connack);
         console.log("[SENT] CONNACK");
     }
-
-    // --- KASUS 2: Arduino minta REGISTER Topik ---
     else if (msgType === TYPE_REGISTER) {
-        // Struktur: [Len, Type, TopicId(2), MsgId(2), TopicName...]
         const msgId = packet.subarray(4, 6);
         const topicName = packet.subarray(6).toString('utf-8');
-
         console.log(`[RECV] REGISTER Topik: '${topicName}'`);
-
-        // Assign ID baru
         const assignedId = nextTopicId++;
         topicMap[assignedId] = topicName;
 
-        // Balas REGACK: [Len=7, Type=0x0B, TopicId_H, TopicId_L, MsgId_H, MsgId_L, RetCode]
         const regack = Buffer.alloc(7);
         regack[0] = 7;
         regack[1] = TYPE_REGACK;
-        regack.writeUInt16BE(assignedId, 2); // Tulis Topic ID (2 byte)
-        regack[4] = msgId[0];                // Copy Msg ID
+        regack.writeUInt16BE(assignedId, 2);
+        regack[4] = msgId[0];
         regack[5] = msgId[1];
-        regack[6] = 0x00;                    // Return Code OK
-
+        regack[6] = 0x00;
         port.write(regack);
         console.log(`[SENT] REGACK (ID: ${assignedId})`);
     }
-
-    // --- KASUS 3: Arduino PUBLISH Data ---
     else if (msgType === TYPE_PUBLISH) {
-        // Struktur: [Len, Type, Flags, TopicId(2), MsgId(2), Data...]
         const topicId = packet.readUInt16BE(3);
         const payload = packet.subarray(7).toString('utf-8');
-
-        // Cari nama topik asli
         const topicName = topicMap[topicId] || `unknown/${topicId}`;
 
         console.log(`[DATA] ${topicName}: ${payload}`);
-
-        // Kirim ke Mosquitto (Broker Internet)
+        
+        // Publish ke Mosquitto Lokal
         mqttClient.publish(topicName, payload);
     }
-    
-    // --- KASUS 4: PINGREQ (Keep Alive) ---
     else if (msgType === TYPE_PINGREQ) {
-        // Balas PINGRESP agar Arduino tidak timeout
         const pingresp = Buffer.from([0x02, TYPE_PINGRESP]);
         port.write(pingresp);
     }
