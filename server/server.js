@@ -7,7 +7,6 @@ import { Server } from "socket.io";
 import cors from "cors";
 import pool from "./db.js"; 
 
-
 const app = express();
 app.use(cors());
 
@@ -19,13 +18,12 @@ const io = new Server(server, {
   }
 });
 
-
-//konversi string dari mqtt ke id dari database
+// --- MAPPING DATA ---
 const ROOM_MAP = { 
-  "R01": 1, "R02": 2, "R03": 3, "R04": 4,//room lt 1
+  "R01": 1, "R02": 2, "R03": 3, "R04": 4, //room lt 1
   "R05": 5, "R06": 6, "R07": 7, "R08": 8  //room lt2
 };
-//id sensor
+
 const SENSE_MAP = { 
   "suhu": 1, 
   "kelembapan": 2, 
@@ -33,25 +31,27 @@ const SENSE_MAP = {
   "kebisingan": 4 
 };
 
-//cara konversi mqtt
-const MQTT_HOST = 'cfc4476f1be24988afb769aef8526aee.s1.eu.hivemq.cloud'; // Cek "Cluster URL" di dashboard
-const MQTT_USER = 'matchalatte';    // Username yang anda buat di Access Management
-const MQTT_PASS = 'Manuk123_';    // Password yang anda buat
-const MQTT_PORT = 8883;
+// --- KONFIGURASI MQTT (GANTI BAGIAN INI) ---
+const MQTT_HOST = 'localhost'; // Gunakan localhost
+const MQTT_PORT = 1883;        // Port default
+const MQTT_USER = '';          // Kosongkan jika tanpa password
+const MQTT_PASS = '';          // Kosongkan jika tanpa password
 
 const mqttOptions = {
-    username: MQTT_USER,
-    password: MQTT_PASS,
     port: MQTT_PORT,
-    protocol: 'mqtts', // Penting: Menggunakan 'mqtts' untuk koneksi aman (SSL)
-    rejectUnauthorized: true, // Pastikan sertifikat server valid
+    protocol: 'mqtt', // Ubah dari 'mqtts' ke 'mqtt' (Tanpa SSL)
 };
 
-// Hubungkan client
-const mqttClient = mqtt.connect(`mqtts://${MQTT_HOST}`, mqttOptions);
+// Tambahkan user/pass ke options HANYA jika diisi
+if (MQTT_USER) mqttOptions.username = MQTT_USER;
+if (MQTT_PASS) mqttOptions.password = MQTT_PASS;
+
+// Hubungkan client (Perhatikan: mqtt:// bukan mqtts://)
+const mqttClient = mqtt.connect(`mqtt://${MQTT_HOST}`, mqttOptions);
 
 mqttClient.on('connect', () => {
-    console.log(`[SERVER] BERHASIL Terhubung ke HiveMQ Cloud!`);
+    console.log(`[SERVER] BERHASIL Terhubung ke Mosquitto Lokal!`);
+    // Subscribe ke pola topik: sensor/NamaRuang/JenisSensor
     mqttClient.subscribe('sensor/+/+'); 
 });
 
@@ -64,17 +64,22 @@ mqttClient.on('offline', () => {
 });
 
 mqttClient.on('message', async (topic, message) => {
+    // Topik yang diharapkan: sensor/R01/suhu
+    console.log(`[TERIMA] ${topic} -> ${message.toString()}`); // Debugging log
+
     const nilai = parseFloat(message.toString());
-    const parts = topic.split('/'); // sensor/R01/suhu
+    const parts = topic.split('/'); 
     
+    // Validasi struktur topik (harus 3 bagian)
     if (parts.length === 3) {
+        const prefix = parts[0];   // "sensor"
         const roomCode = parts[1]; // "R01"
         const typeStr = parts[2];  // "suhu"
         
-        //kirim data langsung ke dashboard
+        // 1. Kirim data langsung ke dashboard (Realtime)
         io.emit('updateSensor', { roomId: roomCode, tipe: typeStr, nilai: nilai });
 
-        //simpan ke dalam database
+        // 2. Simpan ke database
         const roomId = ROOM_MAP[roomCode];
         const senseId = SENSE_MAP[typeStr];
 
@@ -84,16 +89,18 @@ mqttClient.on('message', async (topic, message) => {
                     'INSERT INTO sensing (sense_id, sense_value, room_id) VALUES ($1, $2, $3)',
                     [senseId, nilai, roomId]
                 );
+                // console.log("Data disimpan ke DB");
             } catch (err) {
                 console.error('❌ DB Insert Error:', err.message);
             }
+        } else {
+            console.warn(`⚠️ ID Ruang atau Sensor tidak dikenali: ${roomCode}, ${typeStr}`);
         }
     }
 });
 
-//endpoint api history untuk fitur history
+// --- API ENDPOINTS ---
 app.get('/api/history', async (req, res) => {
-    //ada 4 filter utama yaitu floor,room,sensor, dan hari
     const { floorId, roomId, senseId, days } = req.query;
 
     try {
@@ -109,7 +116,6 @@ app.get('/api/history', async (req, res) => {
             LIMIT 500;
         `;
         
-        // Kirim 4 parameter ke query
         const result = await pool.query(queryText, [floorId, roomId, senseId, days]);
         res.json(result.rows);
     } catch (err) {
