@@ -1,28 +1,63 @@
-## Usage
+# Aplikasi Pemantauan Kebisingan dan Pencahayaan Perpustakaan Unpar
+Aplikasi dashboard berbasis web untuk memantau tingkat kebisingan dan pencahayaan di Perpustakaan Unpar secara real-time. Proyek ini merupakan bagian dari Tugas Besar Mata Kuliah Internet of Things.
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+## Latar Belakang
+Perpustakaan Unpar merupakan tempat bagi para mahasiswa untuk membaca buku, mengerjakan tugas, maupun bersantai sambil menunggu kelas kuliah. Perpustakaan harus memiliki kondisi yang tenang dan nyaman agar mahasiswa dapat melakukan aktivitasnya dengan baik. Terdapat dua parameter dari perpustakaan, yang dapat mempengaruhi ketenangan dan kenyamanan perpustakaan, yaitu tingkat kebisingan dan pencahayaan.
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+Apabila tingkat kebisingan melebihi batas yang sewajarnya, maka konsentrasi mahasiswa di perpustakaan dapat terganggu karena suara yang terlalu bising. Lalu, apabila tingkat pencahayaan di perpustakaan kurang terang, dapat mengganggu kenyamanan mahasiswa dalam melakukan aktivitas di perpustakaan, karena kondisi ruangan yang relatif gelap.
 
-## Available Scripts
+Menurut Peraturan Menteri Lingkungan Hidup KEP-48/MENLH/11/1996, nilai kebisingan maksimal yang direkomendasikan pada ruang perpustakaan adalah sebesar 55dB. Selanjutnya, menurut standar pada SNI 6197:2020 mengenai tingkat minimal pencahayaan, tingkat pencahayaan rata-rata minimum pada ruang baca perpustakaan adalah 350 lux.
 
-In the project directory, you can run:
+Oleh karena itu, perlu dibangun suatu aplikasi pemantauan kebisingan dan pencahayaan perpustakaan, yang dapat menggambarkan lokasi mana saja dalam perpustakaan yang sering terdapat kebisingan maupun pencahayaan yang kurang, agar pihak universitas dapat memantau dan mengambil tindakan lanjut dari hasil pemantauan aplikasi.
 
-### `npm run dev`
+## Teknologi yang Digunakan
+- Frontend: [SolidJS] dengan Vite
+- Backend: Node.js
+- Database: PostgreSQL
+- IoT Protocol: MQTT / MQTT-SN
 
-Runs the app in the development mode.<br>
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+## Instalasi dan Konfigurasi
+1. Prasyarat
+Pastikan Anda telah menginstal Node.js dan PostgreSQL di sistem Anda.
 
-### `npm run build`
+2. Instalasi Dependensi
+Kloning repositori proyek dan instal semua dependensi yang diperlukan:
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+bash
+# Kloning repositori
+git clone https://github.com/HansStevensen/Monitoring_perpustakaan
+cd Monitoring_perpustakaan
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+# Install dependensi
+npm install
+npm install dotenv
 
-## Deployment
+3. Konfigurasi Environment Variables
+Buat file .env di root direktori proyek dengan isi berikut:
 
-Learn more about deploying your application with the [documentations](https://vite.dev/guide/static-deploy.html)
+env
+DB_USER=postgres
+DB_HOST=localhost
+DB_NAME=perpustakaan_iot
+DB_USER_PASSWORD=postgres
+Catatan: Sesuaikan nilai-nilai tersebut dengan konfigurasi database PostgreSQL Anda.
+
+4. Setup Database
+Pastikan PostgreSQL service sedang berjalan
+
+Buat database sesuai dengan nama yang didefinisikan di file .env (default: perpustakaan_iot)
+
+Jalankan file SQL yang disediakan dalam proyek untuk membuat tabel-tabel yang diperlukan
+
+5. Mode Pengembangan (Development)
+Jalankan server pengembangan lokal dengan fitur Hot Module Replacement (HMR) untuk kemudahan live-reloading saat Anda melakukan perubahan pada kode:
+
+npm run dev
+
+Aplikasi akan tersedia dan dapat diakses melalui browser Anda pada alamat berikut: http://localhost:5173.
+
+6. Produksi (Building for Production)
+Untuk membuat build statis yang siap di-deploy ke lingkungan produksi, jalankan perintah build:
+
+npm run build
+Hasil build yang telah dioptimalkan akan tersimpan dalam direktori dist. File ini siap untuk di-hosting di server manapun.
